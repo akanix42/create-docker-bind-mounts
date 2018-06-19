@@ -6,22 +6,24 @@ interface IDockerCompose {
   services: IDockerService[];
 }
 
-interface IDockerService {
+interface IDockerService {}
 
-}
-
-export default function getMountPoints(composeFilePath: string, mountPointPattern: RegExp) {
+export default function getMountPoints(
+  composeFilePath: string,
+  mountPointPattern: RegExp,
+) {
   try {
-    const doc = yaml.safeLoad(fs.readFileSync(composeFilePath, { encoding: 'utf-8' })) as IDockerCompose;
+    const doc = yaml.safeLoad(
+      fs.readFileSync(composeFilePath, { encoding: 'utf-8' }),
+    ) as IDockerCompose;
     const services = getServicesArray(doc.services);
     return getMountPointsFromServices(services);
   } catch (err) {
     console.log('Error loading YAML:', err);
   }
 
-
   function getServicesArray(servicesObject) {
-    return Object.keys(servicesObject).map(key => servicesObject[key]);
+    return Object.keys(servicesObject).map((key) => servicesObject[key]);
   }
 
   function getMountPointsFromServices(services) {
@@ -30,13 +32,16 @@ export default function getMountPoints(composeFilePath: string, mountPointPatter
         return mountPoints;
       }
 
-      const constraints = service.deploy && service.deploy.placement && service.deploy.placement
-                          ? service.deploy.placement.constraints
-                          : null;
-      const serviceMountPoints = service.volumes.map(getLocalMountPoint)
-        .filter(mountPoint => !!mountPoint);
+      const constraints =
+        service.deploy && service.deploy.placement && service.deploy.placement
+          ? service.deploy.placement.constraints
+          : null;
+      const serviceMountPoints = service.volumes
+        .map(getLocalMountPoint)
+        .filter((mountPoint) => !!mountPoint);
 
-      return [...mountPoints,
+      return [
+        ...mountPoints,
         {
           constraints,
           directories: [...serviceMountPoints],
@@ -56,6 +61,4 @@ export default function getMountPoints(composeFilePath: string, mountPointPatter
     }
     return volumeMapping.source;
   }
-
 }
-
