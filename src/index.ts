@@ -25,7 +25,7 @@ yargs
   .alias('h', 'help');
 
 const args = yargs.argv;
-const mountPattern = new RegExp(`${escapeStringRegexp(args.dir)}`);
+const mountPattern = new RegExp(`^${escapeStringRegexp(args.dir)}`);
 const mountPoints = getMountPoints(args.composeFile, mountPattern);
 
 createDirectoriesOnNodes(
